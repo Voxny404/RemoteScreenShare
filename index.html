@@ -1,0 +1,264 @@
+<style>
+    body {
+        background-color: black;
+        overflow: hidden;
+    }
+    #photo {
+        height: auto;
+        max-width: 100%;
+        position: fixed; 
+        left: 0px; 
+        top: 0px; 
+        z-index: 0;
+        background-repeat: no-repeat;
+        background-size: contain;
+        -webkit-user-drag: none; 
+        user-select: none;
+    }
+    #mousePointer {
+        display: none;
+        width: .7em;
+        left: -10px; 
+        top: -10px; 
+        position: relative;
+        z-index: 1;
+    }
+    #topBar {
+        width: 100%;
+        height: 5px;
+        background-color: rgb(0, 0, 0);
+        z-index: 2;
+        position: fixed;
+        top: 0;
+        left: 0;
+        padding: .5em;
+        opacity: .7;
+    }
+    #topBar p {
+        margin-top: 0;
+        padding-top: 5px;
+        font-size: 12px;
+        color: #ffffff;
+    }
+    #topBarContent {
+        display: none;
+    }
+    #topBar:hover #topBarContent{
+        display: flex;
+        gap: 1em;
+        height: 20px;
+        width: 100%;
+        position: fixed;
+        top: 0;
+        left: 0;
+        background: linear-gradient(180deg, rgba(2,0,36,1) 1%, rgba(11, 44, 46, 0.496) 100%, rgba(0,212,255,1) 100%);
+    }
+
+    /* @media screen and (max-width: 768px){
+ 
+        #photo{
+            width: auto;
+            height: 100%;
+            max-height: 100%;
+        }
+    } */
+</style>
+<svg id="mousePointer"
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   id="svg2"
+   sodipodi:docname="Black Mouse Cursor Arow (Fixed).svg"
+   viewBox="0 0 600.00001 950"
+   version="1.1"
+   inkscape:version="0.91 r13725"
+   >
+  <defs
+     id="defs133" />
+  <g
+     id="layer2"
+     inkscape:label="Layer"
+     inkscape:groupmode="layer"
+     transform="translate(-555.1899,-182.7993)">
+    <path
+       style="fill:#ffffff;fill-opacity:1"
+       d="m 555.19,182.7993 0,850.0038 99.99801,0 0,-49.99816 -0.0572,0 0.0572,-0.0357 49.999,0 0,-49.99812 49.999,0 0,-49.99812 49.99901,0 0,99.99624 49.999,0 0.73359,0 -0.73359,100.03196 49.999,0 0,49.9981 99.99798,0 0,-49.9981 49.999,0 0,-99.99626 -49.999,0 -0.7336,-0.0357 0.7336,-99.99624 -49.99897,0 0,-49.99812 200.00787,0 0,-49.99812 0,-49.99812 -49.999,0 0,0.069 -0.012,-0.069 0,-49.99812 -49.999,0 0,-49.99811 -49.999,0 0,-49.99812 -49.99897,0 0,-49.99812 -49.99901,0 0,-49.99812 -49.999,0 0,-49.99812 -49.999,0 0,-49.99812 -49.99901,0 0,-49.99812 -49.999,0 0,-49.99812 -49.999,0 0,-49.99812 -49.99901,0 0,-49.99812 -49.999,0 z"
+       id="rect3134"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccccccccccccccccccccccccccccccccccccccccccccccccccccc" />
+    <path
+       style="fill:#000000;fill-opacity:1"
+       d="m 50,99.996094 0,699.974606 49.998047,0 0,-49.99804 50.000003,0 0,-49.99805 49.99804,0 0,-50 50,0 0,50 49.99805,0 0,99.99609 49.99805,0 0,100.03125 99.99804,0 0,-99.99609 -49.99804,0 0,-100.03125 -50,0 0,-99.99805 199.99609,0 0,-49.99804 -49.99805,0 0,-49.99805 -50,0 0,-49.99805 -49.99804,0 0,-49.99804 -50,0 0,-49.99805 -49.99805,0 0,-49.99805 -49.99805,0 0,-49.99805 -50,0 0,-49.99804 -49.99804,0 0,-49.99805 -50.000003,0 0,-49.998046 z"
+       transform="translate(555.1899,182.7993)"
+       id="rect56"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccccccccccccccccccccccccccccccccccccccc" />
+  </g>
+</svg>
+<div id="topBar">
+    <div id="topBarContent">
+        <p> Client-remote </p>
+        <button id="fullScreen">Full screen</button>
+    </div>
+</div>
+<img id="photo" autoplay virtualkeyboardpolicy="manual" inputmode="text"></img>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.0/socket.io.min.js"></script>
+<script>
+    const address = document.location.href.includes('file') || document.location.href.includes('localhost') ? 'http://localhost:3032' : document.location.origin + ':3032';
+    const isLocalHost = document.location.href.includes('file') || document.location.href.includes('localhost') ? true : false;
+    const socket = io(address, { transports : ['websocket'], reconnect: true });
+    
+    let mousePointer = document.getElementById('mousePointer')
+    let screenDisplay = document.getElementById('photo')
+    let mouseDisableTimeOut = null;
+    let originalScreen = {width: null, height: null};
+    let clientScreen = {width: null, height: null};
+
+    // Handle error messages from server
+    socket.on('error', (error) => onConnectionError(error));
+    socket.on('connect_error', err => alert(err + '\n Cannot connect to server!'));
+    socket.on('connect_failed', err => alert(err + '\n Server connection failed!'));
+
+    // Handle open message from server
+    socket.on('open', async (open) => onOpenConnection (open));
+
+    // Handle answer message from server
+    socket.on('answer', async (answer) => onAnswer (answer));
+    
+    // Handle audio message from server
+    socket.on('audio', async(audio) => onAudio(audio));
+
+    screenDisplay.addEventListener("keypress", (event) => onKeyPressEvent(event));
+
+    screenDisplay.addEventListener("mousedown", (event) => onMouseDownEvent(event));
+
+    screenDisplay.addEventListener("mousemove", (e) => onMouseMoveEvent(e), false);
+
+    screenDisplay.addEventListener("touchmove", (e) =>  onTouchMoveEvent(e), false);
+
+    screenDisplay.addEventListener("touchstart", (e) => onTouchEvent(e), false);
+
+    window.addEventListener('DOMContentLoaded', (event) => {
+        // fullscreen button
+        const button = document.getElementById('fullScreen');
+        button.addEventListener('click', () => {
+            document.body.requestFullscreen();
+        });
+    });
+
+    // event handler helper functions 
+    function onKeyPressEvent (event) {
+        // console.log(event.key);
+        if (!isLocalHost) socket.emit('inputKey', event.key)
+    }
+
+    function onMouseDownEvent (event) {
+        //console.log(event);
+        if (!isLocalHost) {
+            if (event.which == 3) socket.emit('inputMouse', 'right')
+            else  socket.emit('inputMouse', 'left')
+        }
+    }
+
+    function onMouseMoveEvent (e) {
+        //console.log('MouseMove', event);
+
+        let remoteMouse = calculateMousePosition(e)
+        moveSVG(remoteMouse)
+        
+        if (!isLocalHost) socket.emit('moveMouse', remoteMouse);
+    }
+
+    function calculateMousePosition(e) {
+        remoteX = (e.clientX )/// clientScreen.width) //* originalScreen.width
+        remoteY = (e.clientY )/// clientScreen.height) //* originalScreen.height
+        return { x: remoteX, y: remoteY }
+    }
+
+    function moveSVG (e){  
+        mousePointer.style.display = 'block'
+        mousePointer.style.left = e.x; 
+        mousePointer.style.top = e.y; 
+        mouseDisableTimeOut = Date.now();
+    }
+
+    function makeMouseInvisable (ms) {
+        if (mouseDisableTimeOut) {
+            let diffTime = getTimeDiff(mouseDisableTimeOut)
+            if (diffTime > ms) mousePointer.style.display = 'none'
+        } else mouseDisableTimeOut = Date.now();
+    }
+
+    function getTimeDiff (start = Date.now()) {
+        let stop = Date.now();
+        return stop - start;
+    }
+
+    function onTouchMoveEvent (e) {
+        let remoteMouse = calculateMousePosition(e)
+        moveSVG(remoteMouse)
+
+        if (!isLocalHost) socket.emit('moveMouse', {x:remoteMouse.x.toFixed(2),y: remoteMouse.y.toFixed(2)})
+    }
+
+    function onTouchEvent (e) {
+        if (!isLocalHost) {
+            if (e.touches.length > 1) socket.emit('inputMouse', 'right')
+            else socket.emit('inputMouse', 'left')
+        }
+    }
+
+    // socket io helper functions 
+    function onAnswer (answer) {
+        try {
+    
+            if (answer) getImageFromBuffer(answer.screen) 
+            makeMouseInvisable(6000)
+
+        } catch (error) {
+            console.error(error);
+            alert(error);
+        }
+    }
+
+    function onAudio (audio) {
+        console.log(audio);
+
+        if (!isLocalHost) {
+            // connect audio
+        }
+    }
+
+    function onOpenConnection (open) {
+        console.log(open);
+        socket.emit('reply', {
+            msg: 'Client-remote!',
+            screenDisplay: 0,
+        });
+    }
+
+    function onConnectionError(e) {
+        console.log(e);
+    }
+
+    // image converter
+    function getImageFromBuffer (response) {
+        // Obtain a blob: URL for the image data.
+        let arrayBufferView = new Uint8Array( response );
+        let blob = new Blob( [ arrayBufferView ], { type: "image/jpeg" } );
+        let urlCreator = window.URL || window.webkitURL;
+        let imageUrl = urlCreator.createObjectURL( blob );
+        let img = screenDisplay;
+        img.src = imageUrl;
+
+        originalScreen = { width: img.naturalWidth, height: img.naturalHeight };
+        clientScreen = { width: img.clientWidth, height: img.clientHeight };
+        //console.log('Original screen : ' + JSON.stringify(originalScreen));
+        //console.log('Client screen : ' + JSON.stringify(clientScreen));
+    }
+    
+</script>

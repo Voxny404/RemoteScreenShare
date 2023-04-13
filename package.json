@@ -1,0 +1,17 @@
+{
+  "name": "remotescreenshare",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start":"node index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "robotjs": "^0.6.0",
+    "screenshot-desktop": "^0.0.0-development",
+    "socket.io": "^4.6.1"
+  }
+}
